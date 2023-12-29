@@ -61,7 +61,7 @@ app.post('/users/login', async (c) => {
 
 app.post('/users/register', async (c) => {
   const body: User = await c.req.json()
-  const usr = await db.insert(users).values({
+  await db.insert(users).values({
     ...body,
     verified: false
   });
@@ -74,7 +74,7 @@ app.post('/users/verify', async (c) => {
     c.status(401)
     return c.text("Invalid token")
   }
-  const usr = await db.update(users).set({ verified: true }).where(eq(users.id, body.id));
+  await db.update(users).set({ verified: true }).where(eq(users.id, body.id));
   return c.text("Successfully verified!");
 })
 
