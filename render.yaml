@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: kgec-alumni-backend
+    env: docker
+    repo: https://github.com/karmakarmeghdip/kgec-alumni-backend
+    plan: starter
+    autoDeploy: false
