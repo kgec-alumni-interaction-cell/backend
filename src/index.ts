@@ -71,8 +71,7 @@ app.post('/users/register', async (c) => {
 app.post('/users/verify', async (c) => {
   const body: { id: number, token: string } = await c.req.json()
   if(body.token !== process.env.TOKEN) {
-    c.status(401)
-    return c.text("Invalid token")
+    return c.text("Invalid token", 401)
   }
   await db.update(users).set({ verified: true }).where(eq(users.id, body.id));
   return c.text("Successfully verified!");
