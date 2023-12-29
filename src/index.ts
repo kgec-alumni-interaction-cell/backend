@@ -23,17 +23,40 @@ app.get('/', (c) => c.text('Server Online!'))
 
 app.get('/users', async (c) => {
   const usr = await db.select().from(users);
-  return c.json(usr);
+  return c.json(usr.map((x: any)=> {
+    delete x.password;
+    return x;  // remove password from response. 🤷‍♂️ 🤷‍♀️ 🤷‍♂️ 🤷‍♀"
+  }));
 })
 
 app.get('/users/alumni', async (c) => {
   const usr = await db.select().from(users).where(eq(users.alumni, true));
-  return c.json(usr);
+  return c.json(usr.map((x: any)=> {
+    delete x.password;
+    return x;  // remove password from response. 🤷‍♂️ 🤷‍♀️ 🤷‍♂️ 🤷‍♀"
+  }));
 })
 
 app.get('/users/students', async (c) => {
   const usr = await db.select().from(users).where(eq(users.alumni, false));
-  return c.json(usr);
+  return c.json(usr.map((x: any)=> {
+    delete x.password;
+    return x;  // remove password from response. 🤷‍♂️ 🤷‍♀️ 🤷‍♂️ 🤷‍♀"
+  }));
+})
+
+app.post('/users/login', async (c) => {
+  const body: { email: string, password: string } = await c.req.json()
+  const usr = await db.select().from(users).where(eq(users.email, body.email));
+  if(usr.length === 0) {
+    c.status(401)
+    return c.text("Invalid email")
+  }
+  if(usr[0].password !== body.password) {
+    c.status(401)
+    return c.text("Invalid password")
+  }
+  return c.json(usr[0]);
 })
 
 app.post('/users/register', async (c) => {
