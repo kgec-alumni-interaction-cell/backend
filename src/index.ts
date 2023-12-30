@@ -1,10 +1,14 @@
 import { drizzle } from 'drizzle-orm/postgres-js';
 import { Hono } from 'hono'
+import { cors } from 'hono/cors'
 import postgres from 'postgres';
 import { users } from './db/schema';
 import { eq } from 'drizzle-orm';
 
 const app = new Hono()
+app.use('/*', cors({
+  origin: '*',
+}))
 const client = postgres(process.env.POSTGRES_URL || panic());
 const db = drizzle(client);
 
