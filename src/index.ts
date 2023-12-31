@@ -1,21 +1,24 @@
-import { drizzle } from 'drizzle-orm/postgres-js';
-import { Hono } from 'hono'
-import { cors } from 'hono/cors'
-import postgres from 'postgres';
-import { users } from './db/schema';
-import { eq } from 'drizzle-orm';
+import { drizzle } from "drizzle-orm/postgres-js";
+import { Hono } from "hono";
+import { cors } from "hono/cors";
+import postgres from "postgres";
+import { users } from "./db/schema";
+import { eq } from "drizzle-orm";
 
-const app = new Hono()
-app.use('/*', cors({
-  origin: '*',
-}))
+const app = new Hono();
+app.use(
+  "/*",
+  cors({
+    origin: "*",
+  })
+);
 const client = postgres(process.env.POSTGRES_URL || panic());
 const db = drizzle(client);
 
 type User = {
   name: string;
   email: string;
-  waNum:string;
+  waNum: string;
   linkedin: string;
   degree: string;
   department: string;
@@ -25,67 +28,82 @@ type User = {
   proofOfGrad: string;
   currWorkplace: string;
   password: string;
-}
+};
 
-app.get('/', (c) => c.text('Server Online!'))
+app.get("/", (c) => c.text("Server Online!"));
 
-app.get('/users', async (c) => {
+app.get("/users", async (c) => {
   const usr = await db.select().from(users);
-  return c.json(usr.map((x: any)=> {
-    delete x.password;
-    return x;  // remove password from response. 🤷‍♂️ 🤷‍♀️ 🤷‍♂️ 🤷‍♀"
-  }));
-})
+  return c.json(
+    usr.map((x: any) => {
+      delete x.password;
+      return x; // remove password from response. 🤷‍♂️ 🤷‍♀️ 🤷‍♂️ 🤷‍♀"
+    })
+  );
+});
 
-app.get('/users/alumni', async (c) => {
+app.get("/users/alumni", async (c) => {
   const usr = await db.select().from(users).where(eq(users.alumni, true));
-  return c.json(usr.map((x: any)=> {
-    delete x.password;
-    return x;  // remove password from response. 🤷‍♂️ 🤷‍♀️ 🤷‍♂️ 🤷‍♀"
-  }));
-})
+  return c.json(
+    usr.map((x: any) => {
+      delete x.password;
+      return x; // remove password from response. 🤷‍♂️ 🤷‍♀️ 🤷‍♂️ 🤷‍♀"
+    })
+  );
+});
 
-app.get('/users/students', async (c) => {
+app.get("/users/students", async (c) => {
   const usr = await db.select().from(users).where(eq(users.alumni, false));
-  return c.json(usr.map((x: any)=> {
-    delete x.password;
-    return x;  // remove password from response. 🤷‍♂️ 🤷‍♀️ 🤷‍♂️ 🤷‍♀"
-  }));
-})
+  return c.json(
+    usr.map((x: any) => {
+      delete x.password;
+      return x; // remove password from response. 🤷‍♂️ 🤷‍♀️ 🤷‍♂️ 🤷‍♀"
+    })
+  );
+});
 
-app.post('/users/login', async (c) => {
-  const body: { email: string, password: string } = await c.req.json()
-  const usr = await db.select().from(users).where(eq(users.email, body.email));
-  if(usr.length === 0) {
-    c.status(401)
-    return c.text("Invalid email")
+app.post("/users/delete", async (c) => {
+  const body: { id: number; token: string } = await c.req.json();
+  if (body.token !== process.env.TOKEN) {
+    return c.text("Invalid token", 401);
   }
-  if(usr[0].password !== body.password) {
-    c.status(401)
-    return c.text("Invalid password")
+  const res = await db.delete(users).where(eq(users.id, body.id));
+  return c.text("Successfully deleted!");
+});
+
+app.post("/users/login", async (c) => {
+  const body: { email: string; password: string } = await c.req.json();
+  const usr = await db.select().from(users).where(eq(users.email, body.email));
+  if (usr.length === 0) {
+    c.status(401);
+    return c.text("Invalid email");
+  }
+  if (usr[0].password !== body.password) {
+    c.status(401);
+    return c.text("Invalid password");
   }
   return c.json(usr[0]);
-})
+});
 
-app.post('/users/register', async (c) => {
-  const body: User = await c.req.json()
+app.post("/users/register", async (c) => {
+  const body: User = await c.req.json();
   await db.insert(users).values({
     ...body,
-    verified: false
+    verified: false,
   });
   return c.text("Successfully added!");
-})
+});
 
-app.post('/users/verify', async (c) => {
-  const body: { id: number, token: string } = await c.req.json()
-  if(body.token !== process.env.TOKEN) {
-    return c.text("Invalid token", 401)
+app.post("/users/verify", async (c) => {
+  const body: { id: number; token: string } = await c.req.json();
+  if (body.token !== process.env.TOKEN) {
+    return c.text("Invalid token", 401);
   }
   await db.update(users).set({ verified: true }).where(eq(users.id, body.id));
   return c.text("Successfully verified!");
-})
+});
 
-export default app
+export default app;
 
 function panic() {
   console.error("POSTGRES_URL not set");
