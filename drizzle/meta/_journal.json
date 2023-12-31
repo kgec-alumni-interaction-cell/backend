@@ -15,6 +15,13 @@
       "when": 1704032772347,
       "tag": "0001_lyrical_wild_child",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1704033306556,
+      "tag": "0002_cuddly_stellaris",
+      "breakpoints": true
     }
   ]
 }

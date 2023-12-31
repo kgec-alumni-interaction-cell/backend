@@ -12,7 +12,7 @@ export const users = pgTable("Users", {
   email: varchar("email", { length: 80 }).unique(),
   waNum: numeric("waNum"),
   linkedin: varchar("linkedin"),
-  degree: varchar("degree", { length: 3 }),
+  degree: varchar("degree", { length: 10 }),
   department: varchar("department", { length: 80 }),
   image: varchar("image"),
   alumni: boolean("alumni"),
