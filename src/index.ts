@@ -15,6 +15,10 @@ const db = drizzle(client);
 type User = {
   name: string;
   email: string;
+  waNum:string;
+  linkedin: string;
+  degree: string;
+  department: string;
   image: string;
   alumni: boolean;
   gradYr: string;

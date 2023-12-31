@@ -2,7 +2,8 @@
   "scripts": {
     "dev": "bun run --hot src/index.ts",
     "migration:generate": "drizzle-kit generate:pg --schema=./src/db/schema.ts",
-    "migration:push": "bun run src/db/migrate.ts"
+    "migration:push": "bun run src/db/migrate.ts",
+    "migrate": "drizzle-kit generate:pg --schema=./src/db/schema.ts && bun run src/db/migrate.ts"
   },
   "dependencies": {
     "drizzle-orm": "^0.29.2",
