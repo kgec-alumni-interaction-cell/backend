@@ -3,7 +3,7 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import postgres from "postgres";
 import { users } from "./db/schema";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 
 const app = new Hono();
 app.use(
@@ -93,6 +93,12 @@ app.post("/users/register", async (c) => {
   });
   return c.text("Successfully added!");
 });
+
+app.post("/users/update", async (c) => {
+  const {id, password, user} : {id: number, password: string, user: User} = await c.req.json();
+  await db.update(users).set(user).where(and(eq(users.id, id), eq(users.password, password)));
+  return c.text("Successfully updated!");
+})
 
 app.post("/users/verify", async (c) => {
   const body: { id: number; token: string } = await c.req.json();
