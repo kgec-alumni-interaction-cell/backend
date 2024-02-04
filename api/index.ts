@@ -5,6 +5,9 @@ import { handle } from "hono/vercel";
 import { cors } from "hono/cors";
 import { users } from "../db/schema";
 import { and, eq } from "drizzle-orm";
+import { Resend } from "resend";
+
+const resend = new Resend(process.env.RESEND_KEY);
 
 export const config = {
   runtime: "edge"
@@ -110,13 +113,17 @@ app.post("/users/verify", async (c) => {
     return c.text("Invalid token", 401);
   }
   await db.update(users).set({ verified: true }).where(eq(users.id, body.id));
+  const usr = await db.select().from(users).where(eq(users.id, body.id));
+  await resend.emails.send({
+    from: 'onboarding@mail.alumni-kgec.in',
+    to: usr[0].email || "abc@def.com",
+    subject: "Congrats 🎊🎊 Your account has been verified",
+    html: `<h1>Welcome to KGEC Alumni Platform</h1>
+          <br><h3>The place to connect with others of the KGEC Family<h3>
+          <p>Go over to <a href=alumni-kgec.in>Alumni Website</a> and meet your old batchmates once again
+          <h2>Thank you very much for registering</h2>`
+  })
   return c.text("Successfully verified!");
 });
 
 export default handle(app);
-
-function panic() {
-  console.error("POSTGRES_URL not set");
-  process.exit(1);
-  return ""; // unreachable code, but typescript doesn't know that. 🤷‍♂️ 🤷‍♀️ 🤷‍♂️ 🤷‍♀"
-}
