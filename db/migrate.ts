@@ -2,6 +2,7 @@ import postgres from "postgres";
 import { PostgresJsDatabase, drizzle } from "drizzle-orm/postgres-js";
 import { migrate } from "drizzle-orm/postgres-js/migrator";
 
+
 if (process.env.POSTGRES_URL) {
   const client = postgres(process.env.POSTGRES_URL, { max: 1 });
   const db = drizzle(client);

@@ -1,17 +1,19 @@
 {
   "scripts": {
-    "dev": "bun run --hot src/index.ts",
+    "start": "vercel dev",
+    "deploy": "vercel",
     "migration:generate": "drizzle-kit generate:pg --schema=./src/db/schema.ts",
     "migration:push": "bun run src/db/migrate.ts",
     "migrate": "drizzle-kit generate:pg --schema=./src/db/schema.ts && bun run src/db/migrate.ts"
   },
   "dependencies": {
+    "@vercel/postgres": "^0.7.2",
     "drizzle-orm": "^0.29.2",
-    "hono": "^3.11.11",
-    "postgres": "^3.4.3"
+    "hono": "^3.11.11"
   },
   "devDependencies": {
     "bun-types": "^1.0.7",
-    "drizzle-kit": "^0.20.9"
+    "drizzle-kit": "^0.20.9",
+    "vercel": "^32.4.1"
   }
 }

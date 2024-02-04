@@ -1,19 +1,23 @@
-import { drizzle } from "drizzle-orm/postgres-js";
+import { drizzle } from "drizzle-orm/vercel-postgres";
+import { sql } from "@vercel/postgres";
 import { Hono } from "hono";
+import { handle } from "hono/vercel";
 import { cors } from "hono/cors";
-import postgres from "postgres";
-import { users } from "./db/schema";
+import { users } from "../db/schema";
 import { and, eq } from "drizzle-orm";
 
-const app = new Hono();
+export const config = {
+  runtime: "edge"
+};
+const app = new Hono().basePath('/api');
+
 app.use(
   "/*",
   cors({
     origin: "*",
   })
 );
-const client = postgres(process.env.POSTGRES_URL || panic());
-const db = drizzle(client);
+export const db = drizzle(sql);
 
 type User = {
   name: string;
@@ -109,7 +113,7 @@ app.post("/users/verify", async (c) => {
   return c.text("Successfully verified!");
 });
 
-export default app;
+export default handle(app);
 
 function panic() {
   console.error("POSTGRES_URL not set");
