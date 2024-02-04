@@ -114,8 +114,7 @@ app.post("/users/verify", async (c) => {
   }
   await db.update(users).set({ verified: true }).where(eq(users.id, body.id));
   const usr = await db.select().from(users).where(eq(users.id, body.id));
-  c.text("Successfully verified!");
-  resend.emails.send({
+  await resend.emails.send({
     from: 'onboarding@mail.alumni-kgec.in',
     to: usr[0].email || "abc@def.com",
     subject: "Congrats 🎊🎊 Your account has been verified",
@@ -124,7 +123,7 @@ app.post("/users/verify", async (c) => {
           <p>Go over to <a href=alumni-kgec.in>Alumni Website</a> and meet your old batchmates once again
           <h2>Thank you very much for registering</h2>`
   })
-  return
+  return c.text("Successfully verified!");
 });
 
 export default handle(app);
