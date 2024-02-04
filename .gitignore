@@ -1,3 +1,7 @@
 /.env
 # /bun.lockb
 /node_modules
+.vercel
+bun.lockb
+devbox.json
+devbox.lock
